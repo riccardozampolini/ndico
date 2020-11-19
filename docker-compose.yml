@@ -14,10 +14,10 @@ services:
     env_file:
       - indico.env
     volumes:
-      - './data/archive:/opt/indico/archive'
-      - './data/log/nginx:/opt/indico/log/nginx'
-      - 'customization:/opt/indico/custom'
-      - 'static-files:/opt/indico/static'
+      - '/opt/indico/share/data/archive:/opt/indico/archive'
+      - '/opt/indico/share/data/log/nginx:/opt/indico/log/nginx'
+      - '/opt/indico/share/customization:/opt/indico/custom'
+      - '/opt/indico/share/static-files:/opt/indico/static'
     tmpfs:
       - /opt/indico/tmp
   indico-static:
@@ -38,7 +38,7 @@ services:
     networks:
       - backend
     volumes:
-      - './data/redis:/data'
+      - '/opt/indico/share/data/redis:/data'
   indico-postgres:
     image: centos/postgresql-96-centos7
     networks:
