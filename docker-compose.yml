@@ -28,7 +28,7 @@ build: indico/static
 networks:
 - frontend
 indico-celery:
-<<: *indico-web
+  <<: *indico-web
 restart: unless-stopped
 networks:
 - backend
