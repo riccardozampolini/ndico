@@ -1,66 +1,66 @@
 version: "2"
 services:
-indico-web: &indico-web
-restart: unless-stopped
-image: getindico/indico:latest
-command: /opt/indico/run_indico.sh
-depends_on:
-- indico-redis
-- indico-celery
-ports:
-# La porta 10007 è esposta da un reverse proxy con NGINX
-- "127.0.0.1:10007:59999" # tcp socket port
-networks:
-- backend
-- frontend
-env_file:
-- indico.env
+  indico-web: &indico-web
+  restart: unless-stopped
+  image: getindico/indico:latest
+  command: /opt/indico/run_indico.sh
+  depends_on:
+    - indico-redis
+    - indico-celery
+  ports:
+    # La porta 10007 è esposta da un reverse proxy con NGINX
+    - "127.0.0.1:10007:59999" # tcp socket port
+  networks:
+    - backend
+    - frontend
+  env_file:
+    - indico.env
+  volumes:
+    - 'archive:/opt/indico/archive'
+    - './data/log/nginx:/opt/indico/log/nginx'
+    - 'customization:/opt/indico/custom'
+    - 'static-files:/opt/indico/static'
+  tmpfs:
+    - /opt/indico/tmp
+  indico-static:
+  restart: unless-stopped
+  build: indico/static
+  networks:
+    - frontend
+  indico-celery:
+    <<: *indico-web
+  restart: unless-stopped
+  networks:
+    - backend
+  depends_on:
+    - indico-redis
+  command: /opt/indico/run_celery.sh
+  ports: []
+  volumes:
+    - 'archive:/opt/indico/archive'
+  indico-redis:
+  image: redis
+  restart: unless-stopped
+  networks:
+    - backend
+  volumes:
+    - './data/redis:/data'
+  indico-postgres:
+  image: centos/postgresql-96-centos7
+  restart: unless-stopped
+  networks:
+    - backend
+  volumes:
+    - './data/postgres:/var/lib/pgsql/data'
+  environment:
+    - POSTGRESQL_USER=indico
+    - POSTGRESQL_PASSWORD=XXXXXXXXXXXXXX
+    - POSTGRESQL_DATABASE=indico
+    - POSTGRESQL_ADMIN_PASSWORD=XXXXXXXXXXXX
 volumes:
-- 'archive:/opt/indico/archive'
-- './data/log/nginx:/opt/indico/log/nginx'
-- 'customization:/opt/indico/custom'
-- 'static-files:/opt/indico/static'
-tmpfs:
-- /opt/indico/tmp
-indico-static:
-restart: unless-stopped
-build: indico/static
+  archive:
+  static-files:
+  customization:
 networks:
-- frontend
-indico-celery:
-  <<: *indico-web
-restart: unless-stopped
-networks:
-- backend
-depends_on:
-- indico-redis
-command: /opt/indico/run_celery.sh
-ports: []
-volumes:
-- 'archive:/opt/indico/archive'
-indico-redis:
-image: redis
-restart: unless-stopped
-networks:
-- backend
-volumes:
-- './data/redis:/data'
-indico-postgres:
-image: centos/postgresql-96-centos7
-restart: unless-stopped
-networks:
-- backend
-volumes:
-- './data/postgres:/var/lib/pgsql/data'
-environment:
-- POSTGRESQL_USER=indico
-- POSTGRESQL_PASSWORD=XXXXXXXXXXXXXX
-- POSTGRESQL_DATABASE=indico
-- POSTGRESQL_ADMIN_PASSWORD=XXXXXXXXXXXX
-volumes:
-archive:
-static-files:
-customization:
-networks:
-backend: {}
-frontend: {}
+  backend: {}
+  frontend: {}
