@@ -28,35 +28,35 @@ services:
   networks:
     - frontend
   indico-celery:
-    "<<": *indico-web
-  restart: unless-stopped
-  networks:
+    <<: *indico-web
+    restart: unless-stopped
+   networks:
     - backend
-  depends_on:
+   depends_on:
     - indico-redis
-  command: /opt/indico/run_celery.sh
-  ports: []
-  volumes:
+    command: /opt/indico/run_celery.sh
+   ports: []
+   volumes:
     - 'archive:/opt/indico/archive'
-  indico-redis:
-  image: redis
-  restart: unless-stopped
-  networks:
-    - backend
-  volumes:
-    - './data/redis:/data'
+   indico-redis:
+    image: redis
+    restart: unless-stopped
+    networks:
+      - backend
+    volumes:
+      - './data/redis:/data'
   indico-postgres:
-  image: centos/postgresql-96-centos7
-  restart: unless-stopped
-  networks:
-    - backend
-  volumes:
-    - './data/postgres:/var/lib/pgsql/data'
-  environment:
-    - POSTGRESQL_USER=indico
-    - POSTGRESQL_PASSWORD=XXXXXXXXXXXXXX
-    - POSTGRESQL_DATABASE=indico
-    - POSTGRESQL_ADMIN_PASSWORD=XXXXXXXXXXXX
+    image: centos/postgresql-96-centos7
+    restart: unless-stopped
+    networks:
+      - backend
+    volumes:
+      - './data/postgres:/var/lib/pgsql/data'
+    environment:
+      - POSTGRESQL_USER=indico
+      - POSTGRESQL_PASSWORD=XXXXXXXXXXXXXX
+      - POSTGRESQL_DATABASE=indico
+      - POSTGRESQL_ADMIN_PASSWORD=XXXXXXXXXXXX
 volumes:
   archive:
   static-files:
