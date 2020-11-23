@@ -7,17 +7,17 @@ services:
       - indico-redis
       - indico-celery
     ports:
-      - "59999"  # tcp socket port
+      - "9090:59999"  # tcp socket port
     networks:
-        - backend
-        - frontend
+      - backend
+      - frontend
     env_file:
       - indico.env
     volumes:
-      - '/opt/indico/share/data/archive:/opt/indico/archive'
-      - '/opt/indico/share/data/log/nginx:/opt/indico/log/nginx'
-      - '/opt/indico/share/customization:/opt/indico/custom'
-      - '/opt/indico/share/static-files:/opt/indico/static'
+      - 'archive:/opt/indico/archive'
+      - './data/log/nginx:/opt/indico/log/nginx'
+      - 'customization:/opt/indico/custom'
+      - 'static-files:/opt/indico/static'
     tmpfs:
       - /opt/indico/tmp
   indico-static:
@@ -32,13 +32,14 @@ services:
       - indico-redis
     command: /opt/indico/run_celery.sh
     ports: []
-    volumes: []
+    volumes:
+      - 'archive:/opt/indico/archive'
   indico-redis:
     image: redis
     networks:
       - backend
     volumes:
-      - '/opt/indico/share/data/redis:/data'
+      - './data/redis:/data'
   indico-postgres:
     image: centos/postgresql-96-centos7
     networks:
@@ -59,6 +60,7 @@ services:
     volumes_from:
       - indico-web
 volumes:
+  archive:
   static-files:
   customization:
 networks:
